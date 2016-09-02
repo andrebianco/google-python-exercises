@@ -42,7 +42,31 @@ def extract_names(filename):
     ['2006', 'Aaliyah 91', Aaron 57', 'Abagail 895', ' ...]
     """
     # +++your code here+++
-    return
+
+    filehtml = open(filename, 'r')
+    doc = filehtml.read()
+
+    year = re.search(r'<input type="text" name="year" id="yob" size="4" value="(.*?)">', doc, re.S).group(1).split(' ')[-1]
+    babynamesdata = [year]
+
+    table = re.search(r'<th scope="col" bgcolor="pink" width="41%">Female name</th></tr>.*?<tr><td colspan="3"><small>',
+                      doc, re.S).group(0)[64:-27]
+
+    table = list(set(table.split('\n')))
+
+    listnames = list()
+
+    for row in table:
+        if len(row) > 5:
+            datarow = (re.findall(r'<tr align="right"><td>(.*?)</td><td>(.*?)</td><td>(.*?)</td>', row, re.S))
+            malename = datarow[0][1] + ' ' + datarow[0][0]
+            femalename = datarow[0][2] + ' ' + datarow[0][0]
+            babynamesdata.append(malename)
+            babynamesdata.append(femalename)
+
+    babynamesdata.sort()
+
+    return babynamesdata
 
 
 def main():
@@ -60,6 +84,9 @@ def main():
     if args[0] == '--summaryfile':
         summary = True
         del args[0]
+
+        for i in range(0, len(args)):
+            print(extract_names(args[i]))
 
         # +++your code here+++
         # For each filename, get the names, then either print the text output
